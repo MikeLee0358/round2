@@ -9,12 +9,13 @@
     <div class="row">
       <div class="col-md-6">
         <h3>最新餐廳</h3>
-        <NewestRestaurants />
+        <NewestRestaurants :restaurants="restaurants" />
         <!-- 最新餐廳 NewestRestaurants -->
       </div>
       <div class="col-md-6">
         <!-- 最新評論 NewestComments-->
         <h3>最新評論</h3>
+        <NewestComments :comments="comments"/>
       </div>
     </div>
   </div>
@@ -24,6 +25,7 @@
 /* eslint-disable */
 import NavTabs from "../components/NavTabs.vue";
 import NewestRestaurants from "../components/NewestRestaurants.vue";
+import NewestComments from "../components/NewestComments.vue";
 const dummyData = {
   restaurants: [
     {
@@ -583,6 +585,7 @@ export default {
   components: {
     NavTabs,
     NewestRestaurants,
+    NewestComments,
   },
   methods: {
     fetchData() {
