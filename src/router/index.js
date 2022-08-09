@@ -28,6 +28,11 @@ const routes = [
     component: () => import('../views/RestaurantsTop.vue')
   },
   {
+    path: '/restaurants/:id',
+    name: 'restaurant',
+    component: () => import('../views/Restaurant.vue')
+  },
+  {
     path: '/Users/top',
     name: 'UsersTop',
     component: () => import('../views/UsersTop.vue')
