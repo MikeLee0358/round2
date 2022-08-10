@@ -38,9 +38,19 @@ const routes = [
     component: () => import('../views/Restaurant.vue')
   },
   {
-    path: '/Users/top',
-    name: 'UsersTop',
+    path: '/users/top',
+    name: 'usersTop',
     component: () => import('../views/UsersTop.vue')
+  },
+  {
+    path: '/users/:id/edit',
+    name: 'user-edit',
+    component: () => import('../views/UserEdit.vue')
+  },
+  {
+    path: '/users/:id',
+    name: 'user',
+    component: () => import('../views/User.vue')
   },
   {
     path: '/signin',
@@ -52,6 +62,7 @@ const routes = [
     name: 'sign-up',
     component: () => import('../views/login/SignUp')
   },
+
   {
     path: '*',
     name: 'not-found',
