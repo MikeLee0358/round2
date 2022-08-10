@@ -49,6 +49,7 @@ export default {
         text: this.text,
         restaurantId: this.restaurantId,
       });
+      this.text = "";
     },
   },
 };
