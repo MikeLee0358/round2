@@ -2,11 +2,11 @@
   <nav aria-label="Page navigation example">
     <ul class="pagination">
       <!-- 前一頁 previousPage -->
-      <li :class="['page-item', { disabled: currentPage === 1}]">
+      <li :class="['page-item', { disabled: currentPage === 1 }]">
         <router-link
           class="page-link"
           aria-label="Previous"
-          :to="{name: 'restaurants', query: {categoryId, page: previousPage} }"
+          :to="{ name: 'restaurants', query: { categoryId, page: previousPage } }"
         >
           <span aria-hidden="true">&laquo;</span>
         </router-link>
@@ -20,9 +20,9 @@
       >
         <router-link
           class="page-link"
-          :to="{name:'restaurants', query: { categoryId, page} }"
+          :to="{ name: 'restaurants', query: { categoryId, page } }"
         >
-          {{page}}
+          {{ page }}
         </router-link>
       </li>
 
@@ -34,7 +34,7 @@
         <router-link
           class="page-link"
           aria-label="Next"
-          :to="{name: 'restaurants', query: { categories, page: nextPage} }"
+          :to="{ name: 'restaurants', query: { categoryId, page: nextPage } }"
         >
           <span aria-hidden="true">&raquo;</span>
         </router-link>
