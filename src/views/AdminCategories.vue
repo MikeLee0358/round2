@@ -92,8 +92,6 @@
 import AdminNav from "@/components/AdminNav";
 import { Toast } from "../utils/helpers";
 import adminAPI from "../apis/admin";
-//  2. 定義暫時使用的資料
-import { v4 as uuidv4 } from "uuid";
 
 export default {
   components: {
@@ -132,11 +130,19 @@ export default {
     handleDelete(id) {
       this.categories = this.categories.filter((category) => category.id !== id);
     },
-    handleCreateNew() {
-      this.categories.push({
-        id: uuidv4(),
-        name: this.newCategoryName,
-      });
+    async handleCreateNew() {
+      try {
+        const { data } = await adminAPI.categories.create({ name: this.newCategoryName });
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "新增categories失敗",
+        });
+      }
     },
     toggleIsEditing(categoryId) {
       //切換isEditing的布林值

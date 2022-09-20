@@ -9,6 +9,13 @@ export default {
           authorization: `bearer ${getToken()}`
         }
       })
+    },
+    create(data) {
+      return apiHelper.post('/admin/categories', data, {
+        headers: {
+          authorization: `bearer ${getToken()}`
+        }
+      })
     }
   },
   restaurants: {

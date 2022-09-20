@@ -114,7 +114,6 @@ export default {
         }
         const { data } = await authorizationAPI.signUp(form);
         this.isProcessing = true;
-        console.log(form);
         if (data.status !== "success") {
           Toast.fire({
             icon: "error",
