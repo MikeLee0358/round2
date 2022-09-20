@@ -18,8 +18,9 @@
             type="button"
             class="btn btn-primary"
             @click.stop.prevent="handleCreateNew"
+            :disabled="isProcessing"
           >
-            新增
+            {{ isProcessing ? "處理中" : "新增" }}
           </button>
         </div>
       </div>
@@ -68,9 +69,7 @@
               v-show="category.isEditing"
               type="button"
               class="btn btn-link mr-2"
-              @click.stop.prevent="
-                updateCategory({ categoryId: category.id, name: category.name })
-              "
+              @click.stop.prevent="updateCategory(category.id, category.name)"
             >
               Save
             </button>
@@ -90,7 +89,7 @@
 
 <script>
 import AdminNav from "@/components/AdminNav";
-import { Toast } from "../utils/helpers";
+import { Toast, ToastOk } from "../utils/helpers";
 import adminAPI from "../apis/admin";
 
 export default {
@@ -102,6 +101,7 @@ export default {
     return {
       categories: [],
       newCategoryName: "",
+      isProcessing: false,
     };
   },
   // 5. 調用 `fetchCategories` 方法
@@ -132,11 +132,20 @@ export default {
     },
     async handleCreateNew() {
       try {
+        if (!this.newCategoryName) return;
         const { data } = await adminAPI.categories.create({ name: this.newCategoryName });
-        if (data.status !== "success") {
-          throw new Error(data.message);
+        this.isProcessing = true;
+        if (data.status === "success") {
+          ToastOk.fire({
+            icon: "success",
+            title: "新增成功！",
+          });
         }
+
+        this.newCategoryName = "";
+        this.isProcessing = false;
       } catch (error) {
+        this.isProcessing = false;
         console.log(error);
         Toast.fire({
           icon: "error",
@@ -157,10 +166,19 @@ export default {
         return category;
       });
     },
-    updateCategory({ categoryId, name }) {
-      // TODO: 透過 API 去向伺服器更新餐廳類別名稱
-      console.log(name);
-      this.toggleIsEditing(categoryId);
+    async updateCategory(categoryId, name) {
+      try {
+        const { data } = await adminAPI.categories.update({ categoryId, name });
+        // TODO: 透過 API 去向伺服器更新餐廳類別名稱
+        if (data.status !== "success") throw new Error(data.message);
+        this.toggleIsEditing(categoryId);
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "update失敗",
+        });
+      }
     },
     handleCancel(categoryId) {
       this.categories = this.categories.map((category) => {
