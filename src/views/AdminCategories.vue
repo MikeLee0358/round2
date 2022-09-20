@@ -11,7 +11,7 @@
             class="form-control"
             placeholder="新增餐廳類別..."
             v-model="newCategoryName"
-          >
+          />
         </div>
         <div class="col-auto">
           <button
@@ -27,36 +27,18 @@
     <table class="table">
       <thead class="thead-dark">
         <tr>
-          <th
-            scope="col"
-            width="60"
-          >
-            #
-          </th>
-          <th scope="col">
-            Category Name
-          </th>
-          <th
-            scope="col"
-            width="210"
-          >
-            Action
-          </th>
+          <th scope="col" width="60">#</th>
+          <th scope="col">Category Name</th>
+          <th scope="col" width="210">Action</th>
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="category in categories"
-          :key="category.id"
-        >
+        <tr v-for="category in categories" :key="category.id">
           <th scope="row">
             {{ category.id }}
           </th>
           <td class="position-relative">
-            <div
-              v-show="!category.isEditing"
-              class="category-name"
-            >
+            <div v-show="!category.isEditing" class="category-name">
               {{ category.name }}
             </div>
             <input
@@ -64,7 +46,7 @@
               v-model="category.name"
               type="text"
               class="form-control"
-            >
+            />
             <span
               v-show="category.isEditing"
               class="cancel"
@@ -86,7 +68,9 @@
               v-show="category.isEditing"
               type="button"
               class="btn btn-link mr-2"
-              @click.stop.prevent="updateCategory({categoryId: category.id, name: category.name})"
+              @click.stop.prevent="
+                updateCategory({ categoryId: category.id, name: category.name })
+              "
             >
               Save
             </button>
@@ -106,36 +90,10 @@
 
 <script>
 import AdminNav from "@/components/AdminNav";
-import { v4 as uuidv4 } from "uuid";
+import { Toast } from "../utils/helpers";
+import adminAPI from "../apis/admin";
 //  2. 定義暫時使用的資料
-const dummyData = {
-  categories: [
-    {
-      id: 1,
-      name: "中式料理",
-      createdAt: "2019-06-22T09:00:43.000Z",
-      updatedAt: "2019-06-22T09:00:43.000Z",
-    },
-    {
-      id: 2,
-      name: "日本料理",
-      createdAt: "2019-06-22T09:00:43.000Z",
-      updatedAt: "2019-06-22T09:00:43.000Z",
-    },
-    {
-      id: 3,
-      name: "義大利料理",
-      createdAt: "2019-06-22T09:00:43.000Z",
-      updatedAt: "2019-06-22T09:00:43.000Z",
-    },
-    {
-      id: 4,
-      name: "墨西哥料理",
-      createdAt: "2019-06-22T09:00:43.000Z",
-      updatedAt: "2019-06-22T09:00:43.000Z",
-    },
-  ],
-};
+import { v4 as uuidv4 } from "uuid";
 
 export default {
   components: {
@@ -154,18 +112,25 @@ export default {
   },
   methods: {
     // 4. 定義 `fetchCategories` 方法，把 `dummyData` 帶入 Vue 物件
-    fetchCategories() {
-      this.categories = dummyData.categories;
-      this.categories = this.categories.map((category) => ({
-        ...category,
-        isEditing: false,
-        nameCashed: "",
-      }));
+    async fetchCategories() {
+      try {
+        const { data } = await adminAPI.categories.get();
+        this.categories = data.categories;
+        this.categories = this.categories.map((category) => ({
+          ...category,
+          isEditing: false,
+          nameCashed: "",
+        }));
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "串接categories失敗",
+        });
+      }
     },
     handleDelete(id) {
-      this.categories = this.categories.filter(
-        (category) => category.id !== id
-      );
+      this.categories = this.categories.filter((category) => category.id !== id);
     },
     handleCreateNew() {
       this.categories.push({
@@ -206,7 +171,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .category-name {
