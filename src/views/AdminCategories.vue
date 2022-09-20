@@ -127,8 +127,18 @@ export default {
         });
       }
     },
-    handleDelete(id) {
-      this.categories = this.categories.filter((category) => category.id !== id);
+    async handleDelete(id) {
+      try {
+        const { data } = await adminAPI.categories.delete(id);
+        if (data.status !== "success") throw new Error(data.message);
+        this.categories = this.categories.filter((category) => category.id !== id);
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "刪除categories失敗",
+        });
+      }
     },
     async handleCreateNew() {
       try {

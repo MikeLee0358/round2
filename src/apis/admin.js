@@ -23,6 +23,13 @@ export default {
           authorization: `bearer ${getToken()}`
         }
       })
+    },
+    delete(categoryId) {
+      return apiHelper.delete(`/admin/categories/${categoryId}`, {
+        headers: {
+          authorization: `bearer ${getToken()}`
+        }
+      })
     }
   },
   restaurants: {
