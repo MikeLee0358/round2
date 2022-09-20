@@ -1,13 +1,8 @@
 <template>
   <div class="container py-5">
-    <form
-      class="w-100"
-      @submit.stop.prevent="handleSubmit"
-    >
+    <form class="w-100" @submit.stop.prevent="handleSubmit">
       <div class="text-center mb-4">
-        <h1 class="h3 mb-3 font-weight-normal">
-          Sign Up
-        </h1>
+        <h1 class="h3 mb-3 font-weight-normal">Sign Up</h1>
       </div>
 
       <div class="form-label-group mb-2">
@@ -19,10 +14,9 @@
           class="form-control"
           placeholder="name"
           autocomplete="username"
-          required
           autofocus
           v-model="name"
-        >
+        />
       </div>
 
       <div class="form-label-group mb-2">
@@ -34,9 +28,8 @@
           class="form-control"
           placeholder="email"
           autocomplete="email"
-          required
           v-model="email"
-        >
+        />
       </div>
 
       <div class="form-label-group mb-3">
@@ -48,9 +41,8 @@
           class="form-control"
           placeholder="Password"
           autocomplete="new-password"
-          required
           v-model="password"
-        >
+        />
       </div>
 
       <div class="form-label-group mb-3">
@@ -62,34 +54,32 @@
           class="form-control"
           placeholder="Password"
           autocomplete="new-password"
-          required
           v-model="passwordCheck"
-        >
+        />
       </div>
 
       <button
         class="btn btn-lg btn-primary btn-block mb-3"
         type="submit"
+        :disabled="isProcessing"
       >
-        Submit
+        {{ isProcessing ? "處理中" : "Submit" }}
       </button>
 
       <div class="text-center mb-3">
         <p>
-          <router-link to="/signin">
-            Sign In
-          </router-link>
+          <router-link to="/signin"> Sign In </router-link>
         </p>
       </div>
 
-      <p class="mt-5 mb-3 text-muted text-center">
-        &copy; 2017-2018
-      </p>
+      <p class="mt-5 mb-3 text-muted text-center">&copy; 2017-2018</p>
     </form>
   </div>
 </template>
 
 <script>
+import authorizationAPI from "../apis/authorization";
+import { Toast, ToastOk } from "../utils/helpers";
 export default {
   data() {
     return {
@@ -97,18 +87,55 @@ export default {
       email: "",
       password: "",
       passwordCheck: "",
+      isProcessing: false,
     };
   },
   methods: {
-    handleSubmit() {
-      const data = JSON.stringify({
-        name: this.name,
-        email: this.email,
-        password: this.password,
-        passwordCheck: this.passwordCheck,
-      });
+    async handleSubmit() {
+      try {
+        const form = {
+          name: this.name,
+          email: this.email,
+          password: this.password,
+          passwordCheck: this.passwordCheck,
+        };
+        if (!this.name || !this.email) {
+          Toast.fire({
+            icon: "warning",
+            title: "請輸入資料",
+          });
+          return;
+        } else if (this.password !== this.passwordCheck) {
+          Toast.fire({
+            icon: "warning",
+            title: "密碼錯誤",
+          });
+          return;
+        }
+        const { data } = await authorizationAPI.signUp(form);
+        this.isProcessing = true;
+        console.log(form);
+        if (data.status !== "success") {
+          Toast.fire({
+            icon: "error",
+            title: "信箱已被註冊",
+          });
+          setTimeout(() => (this.isProcessing = false), 1000);
+          return;
+        }
 
-      console.log("data", data);
+        setTimeout(() => this.$router.push({ name: "sign-in" }), 1500);
+        ToastOk.fire({
+          icon: "success",
+          title: "註冊成功！跳轉中...",
+        });
+      } catch (error) {
+        console.log(error);
+        Toast.fire({
+          icon: "error",
+          title: "註冊失敗",
+        });
+      }
     },
   },
 };

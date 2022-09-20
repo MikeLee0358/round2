@@ -11,8 +11,8 @@
         <img
           class="img-responsive center-block"
           :src="restaurant.image | emptyImage"
-          style="width: 250px;margin-bottom: 25px;"
-        >
+          style="width: 250px; margin-bottom: 25px"
+        />
         <div class="well">
           <ul class="list-unstyled">
             <li>
@@ -34,38 +34,16 @@
         <p>{{ restaurant.description }}</p>
       </div>
     </div>
-    <hr>
-    <button
-      type="button"
-      class="btn btn-link"
-      @click="$router.back()"
-    >回上一頁</button>
+    <hr />
+    <button type="button" class="btn btn-link" @click="$router.back()">回上一頁</button>
   </div>
 </template>
 
 <script>
 import { emptyImage } from "../utils/mixins";
-const dummyData = {
-  restaurant: {
-    id: 2,
-    name: "Mrs. Mckenzie Johnston",
-    tel: "567-714-6131 x621",
-    address: "61371 Rosalinda Knoll",
-    opening_hours: "08:00",
-    description:
-      "Quia pariatur perferendis architecto tenetur omnis pariatur tempore.",
-    image: "",
-    createdAt: "2019-06-22T09:00:43.000Z",
-    updatedAt: "2019-06-22T09:00:43.000Z",
-    CategoryId: 3,
-    Category: {
-      id: 3,
-      name: "義大利料理",
-      createdAt: "2019-06-22T09:00:43.000Z",
-      updatedAt: "2019-06-22T09:00:43.000Z",
-    },
-  },
-};
+import adminAPI from "../apis/admin";
+import { Toast } from "../utils/helpers";
+
 export default {
   mixins: [emptyImage],
   name: "AdminRestaurant",
@@ -89,21 +67,34 @@ export default {
     this.fetchRestaurant(restaurantId);
   },
   methods: {
-    fetchRestaurant(restaurantId) {
-      console.log(restaurantId);
-      const { restaurant } = dummyData;
-      this.restaurant = {
-        ...this.restaurant,
-        id: restaurant.id,
-        name: restaurant.name,
-        categoryName: restaurant.Category.name,
-        image: restaurant.image,
-        openingHours: restaurant.opening_hours,
-        tel: restaurant.tel,
-        address: restaurant.address,
-        description: restaurant.description,
-      };
+    async fetchRestaurant(restaurantId) {
+      try {
+        const { data } = await adminAPI.restaurants.getDetail({ restaurantId });
+        const { restaurant } = data;
+        this.restaurant = {
+          ...this.restaurant,
+          id: restaurant.id,
+          name: restaurant.name,
+          categoryName: restaurant.Category.name,
+          image: restaurant.image,
+          openingHours: restaurant.opening_hours,
+          tel: restaurant.tel,
+          address: restaurant.address,
+          description: restaurant.description,
+        };
+      } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "restaurant串接失敗",
+        });
+      }
     },
+  },
+  beforeRouteUpdate(to, from, next) {
+    // 路由改變，重新抓取資料
+    const { id } = to.params;
+    this.fetchRestaurant(id)
+    next();
   },
 };
 </script>

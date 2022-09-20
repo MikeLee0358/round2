@@ -41,7 +41,7 @@
           type="button"
           class="btn btn-danger like mr-2"
           v-if="restaurant.isLiked"
-          @click.stop.prevent="toggleLiked(restaurant.isLiked)"
+          @click.stop.prevent="toggleLiked(restaurant.id)"
         >
           Unlike
         </button>
@@ -49,7 +49,7 @@
           type="button"
           class="btn btn-primary like mr-2"
           v-else
-          @click.stop.prevent="toggleLiked(restaurant.isLiked)"
+          @click.stop.prevent="toggleLiked(restaurant.id)"
         >
           Like
         </button>
@@ -96,7 +96,7 @@ export default {
     },
     async deleteFavorite(restaurantId) {
       try {
-        const { data } = await usersAPI.deleteFavorite(restaurantId);
+        const { data } = await usersAPI.deleteFavorite({ restaurantId });
 
         if (data.status === "error") {
           throw new Error(data.message);
@@ -110,6 +110,41 @@ export default {
         Toast.fire({
           icon: "error",
           title: "錯誤，請稍後再試",
+        });
+      }
+    },
+    async addLiked(restaurantId) {
+      try {
+        const { data } = await usersAPI.addLiked({ restaurantId });
+
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+
+        this.restaurant = {
+          ...this.restaurant,
+          isLiked: true,
+        };
+      } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "錯誤，請稍後再試。",
+        });
+      }
+    },
+    async toggleLiked(restaurantId) {
+      try {
+        if (this.restaurant.isLiked === false) await usersAPI.addLiked({ restaurantId });
+        else await usersAPI.deleteLiked({ restaurantId });
+
+        this.restaurant = {
+          ...this.restaurant,
+          isLiked: !this.restaurant.isLiked,
+        };
+      } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "錯誤，請稍後再試。",
         });
       }
     },

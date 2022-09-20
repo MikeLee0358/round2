@@ -1,5 +1,5 @@
 <template>
-  <form @submit.stop.prevent="handleSubmit">
+  <form @submit.stop.prevent="handleSubmit" v-show="!isLoading">
     <div class="form-group">
       <label for="name">Name</label>
       <input
@@ -10,7 +10,7 @@
         placeholder="Enter name"
         required
         v-model="restaurant.name"
-      >
+      />
     </div>
 
     <div class="form-group">
@@ -22,19 +22,10 @@
         required
         v-model="restaurant.categoryId"
       >
-        <option
-          value=""
-          selected
-          disabled
-        >
-          --請選擇--
+        <option value="" selected disabled>--請選擇--</option>
+        <option v-for="category in categories" :key="category.id" :value="category.id">
+          {{ category.name }}
         </option>
-        <option
-          v-for="category in categories"
-          :key="category.id"
-          :value="category.id"
-        > {{ category.name }}</option>
-
       </select>
     </div>
 
@@ -47,7 +38,7 @@
         name="tel"
         placeholder="Enter telephone number"
         v-model="restaurant.tel"
-      >
+      />
     </div>
 
     <div class="form-group">
@@ -59,7 +50,7 @@
         placeholder="Enter address"
         name="address"
         v-model="restaurant.address"
-      >
+      />
     </div>
 
     <div class="form-group">
@@ -70,7 +61,7 @@
         class="form-control"
         name="opening_hours"
         v-model="restaurant.openingHours"
-      >
+      />
     </div>
 
     <div class="form-group">
@@ -92,7 +83,7 @@
         class="d-block img-thumbnail mb-3"
         width="200"
         height="200"
-      >
+      />
       <input
         id="image"
         type="file"
@@ -100,47 +91,19 @@
         accept="image/*"
         class="form-control-file"
         @change="handleFileChange"
-      >
+      />
     </div>
 
-    <button
-      type="submit"
-      class="btn btn-primary"
-    >
-      送出
+    <button type="submit" class="btn btn-primary" :disabled="isProcessing">
+      {{ isProcessing ? "處理中" : "送出" }}
     </button>
   </form>
 </template>
 
 <script>
-const dummyData = {
-  categories: [
-    {
-      id: 1,
-      name: "中式料理",
-      createdAt: "2019-06-22T09:00:43.000Z",
-      updatedAt: "2019-06-22T09:00:43.000Z",
-    },
-    {
-      id: 2,
-      name: "日本料理",
-      createdAt: "2019-06-22T09:00:43.000Z",
-      updatedAt: "2019-06-22T09:00:43.000Z",
-    },
-    {
-      id: 3,
-      name: "義大利料理",
-      createdAt: "2019-06-22T09:00:43.000Z",
-      updatedAt: "2019-06-22T09:00:43.000Z",
-    },
-    {
-      id: 4,
-      name: "墨西哥料理",
-      createdAt: "2019-06-22T09:00:43.000Z",
-      updatedAt: "2019-06-22T09:00:43.000Z",
-    },
-  ],
-};
+import adminAPI from "../apis/admin";
+import { Toast } from "../utils/helpers";
+
 export default {
   data() {
     return {
@@ -154,6 +117,7 @@ export default {
         openingHours: "",
       },
       categories: [],
+      isLoading: true,
     };
   },
   props: {
@@ -169,10 +133,28 @@ export default {
         openingHours: "",
       }),
     },
+    isProcessing: {
+      type: Boolean,
+      default: false,
+    },
   },
   methods: {
-    fetchData() {
-      this.categories = dummyData.categories;
+    async fetchData() {
+      try {
+        const { data } = await adminAPI.categories.get();
+
+        if (data.status === "error") {
+          throw new Error(data.message);
+        }
+        this.categories = data.categories;
+        this.isLoading = false;
+      } catch (error) {
+        this.isLoading = false;
+        Toast.fire({
+          icon: "error",
+          title: "無法取得餐廳類別，請稍後再試",
+        });
+      }
     },
     handleFileChange(e) {
       const { files } = e.target;
@@ -182,9 +164,31 @@ export default {
         : (this.restaurant.image = imageURL);
     },
     handleSubmit(e) {
+      if (!this.restaurant.name) {
+        Toast.fire({
+          icon: "warning",
+          title: "請輸入名稱",
+        });
+        return;
+      } else if (!this.restaurant.categoryId) {
+        Toast.fire({
+          icon: "warning",
+          title: "請選擇餐廳類別",
+        });
+        return;
+      }
+
       const form = e.target;
       let formData = new FormData(form);
       this.$emit("after-submit", formData);
+    },
+  },
+  watch: {
+    restaurantInitial(newValue) {
+      this.restaurant = {
+        ...this.restaurant,
+        ...newValue,
+      };
     },
   },
   created() {

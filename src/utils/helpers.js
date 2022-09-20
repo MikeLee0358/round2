@@ -14,3 +14,9 @@ export const Toast = Swal.mixin({
   showConfirmButton: false,
   timer: 3000
 })
+export const ToastOk = Swal.mixin({
+  toast: true,
+  position: 'center',
+  showConfirmButton: false,
+  timer: 1500
+})
