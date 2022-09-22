@@ -60,7 +60,7 @@ export default {
       type: Object,
       required: true,
     },
-    isFollowedInitial: {
+    initialIsFollowed: {
       type: Boolean,
       required: true,
     },
@@ -71,20 +71,23 @@ export default {
   },
   data() {
     return {
-      isFollowed: this.isFollowedInitial,
+      isFollowed: this.initialIsFollowed,
     };
   },
   methods: {
     async addFollow(userId) {
       try {
+        // post API
         const { data, statusText } = await usersAPI.addFollowing({
           userId,
         });
 
-        console.log(data);
+        // 有顯示出來，代表post成功
+        console.log("data", data);
         if (statusText !== "OK" || data.status !== "success") {
           throw new Error(statusText);
         }
+        // 切換按鈕
         this.isFollowed = true;
       } catch (error) {
         Toast.fire({
