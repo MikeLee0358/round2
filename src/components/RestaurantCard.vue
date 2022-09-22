@@ -120,7 +120,6 @@ export default {
         if (data.status === "error") {
           throw new Error(data.message);
         }
-
         this.restaurant = {
           ...this.restaurant,
           isLiked: true,

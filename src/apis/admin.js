@@ -10,8 +10,8 @@ export default {
         }
       })
     },
-    create(data) {
-      return apiHelper.post('/admin/categories', data, {
+    create({ name }) {
+      return apiHelper.post('/admin/categories', { name }, {
         headers: {
           authorization: `bearer ${getToken()}`
         }

@@ -89,7 +89,7 @@
 
 <script>
 import AdminNav from "@/components/AdminNav";
-import { Toast, ToastOk } from "../utils/helpers";
+import { Toast } from "../utils/helpers";
 import adminAPI from "../apis/admin";
 
 export default {
@@ -112,7 +112,9 @@ export default {
     // 4. 定義 `fetchCategories` 方法，把 `dummyData` 帶入 Vue 物件
     async fetchCategories() {
       try {
-        const { data } = await adminAPI.categories.get();
+        const { data, statusText } = await adminAPI.categories.get();
+        console.log(data);
+        if (statusText !== "OK") throw new Error(statusText);
         this.categories = data.categories;
         this.categories = this.categories.map((category) => ({
           ...category,
@@ -142,24 +144,35 @@ export default {
     },
     async handleCreateNew() {
       try {
-        if (!this.newCategoryName) return;
-        const { data } = await adminAPI.categories.create({ name: this.newCategoryName });
-        this.isProcessing = true;
-        if (data.status === "success") {
-          ToastOk.fire({
-            icon: "success",
-            title: "新增成功！",
+        if (!this.newCategoryName.trim()) {
+          Toast.fire({
+            icon: "error",
+            title: "請輸入類別名稱",
           });
+          return;
         }
-
-        this.newCategoryName = "";
+        this.isProcessing = true;
+        const { data } = await adminAPI.categories.create({
+          name: this.newCategoryName,
+        });
+        console.log(data);
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+        // 成功新增，重新拉資料
+        this.categories.push({
+          id: data.categoryId,
+          name: this.newCategoryName.trim(),
+          isEditing: false,
+          nameCached: "",
+        });
         this.isProcessing = false;
+        this.newCategory = "";
       } catch (error) {
-        this.isProcessing = false;
         console.log(error);
         Toast.fire({
           icon: "error",
-          title: "新增categories失敗",
+          title: "新增失敗",
         });
       }
     },

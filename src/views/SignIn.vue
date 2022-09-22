@@ -82,9 +82,10 @@ export default {
 
         const { data } = response;
         if (data.status !== "success") throw new Error(data.message);
+
         localStorage.setItem("token", data.token);
+        this.$store.commit("setCurrentUser", data.user);
         this.$router.push("/restaurants");
-        
       } catch (error) {
         console.log(error);
         this.isProcessing = false;

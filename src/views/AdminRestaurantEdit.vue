@@ -87,7 +87,6 @@ export default {
   },
   beforeRouteUpdate(to, from, next) {
     // 路由改變時重新抓取資料
-    console.log("123", { to, from });
     const { id } = to.params;
     this.fetchData(id);
     next();

@@ -1,18 +1,12 @@
 <template>
   <div>
-    <h2 class="my-4">
-      所有評論：
-    </h2>
+    <h2 class="my-4">所有評論：</h2>
 
-    <div
-      v-for="comment in comments"
-      :key="comment.id"
-    >
+    <div v-for="comment in comments" :key="comment.id">
       <blockquote class="blockquote mb-0">
         <button
           type="button"
           class="btn btn-danger float-right"
-          v-show="comment.User.isAdmin"
           @click.stop.prevent="handleDeleteBtnClick(comment.id)"
         >
           Delete
@@ -27,12 +21,14 @@
           {{ comment.createdAt | fromNow }}
         </footer>
       </blockquote>
-      <hr>
+      <hr />
     </div>
   </div>
 </template>
 
 <script>
+import restaurantCommentsAPI from "../apis/restaurantComments";
+import { Toast } from "../utils/helpers";
 import { fromNowFilter } from "../utils/mixins";
 export default {
   mixins: [fromNowFilter],
@@ -44,13 +40,17 @@ export default {
     },
   },
   methods: {
-    handleDeleteBtnClick(commentId) {
-      //1. TODO 請求ＡＰＩ伺服器，刪除id為commentId的評論
+    async handleDeleteBtnClick(commentId) {
+      try {
+        await restaurantCommentsAPI.delete(commentId);
 
-      //2. 透過$emit 請求父頁面做某事件
-      //由父元素統一修改data資料 然後重新渲染
-      //如果在子元件操作，會更新畫面，但是資料不會同步。
-      this.$emit("delete-comment-event", commentId);
+        this.$emit("delete-comment-event", commentId);
+      } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "刪除失敗提示",
+        });
+      }
     },
   },
 };
