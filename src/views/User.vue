@@ -5,7 +5,7 @@
       <UserProfileCard
         :profile="profile"
         :current-user="currentUser.id === profile.id"
-        :initialIsFollowed="isFollowed"
+        :initial-is-followed="isFollowed"
       />
     </div>
     <div class="row">
