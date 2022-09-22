@@ -7,6 +7,7 @@ export default {
       headers: { Authorization: `Bearer ${getToken()}` }
     })
   },
+  // post的路由設定
   get({ userId }) {
     return apiHelper.get(`/users/${userId}`, {
       headers: { Authorization: `Bearer ${getToken()}` }

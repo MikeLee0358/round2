@@ -5,7 +5,7 @@
       <UserProfileCard
         :profile="profile"
         :current-user="currentUser.id === profile.id"
-        :isFollowedInitial="isFollowed"
+        :initialIsFollowed="isFollowed"
       />
     </div>
     <div class="row">
@@ -63,6 +63,7 @@ export default {
           ...data.profile,
         };
         this.isFollowed = data.isFollowed;
+        console.log(data.isFollowed);
       } catch (error) {
         Toast.fire({
           icon: "error",
