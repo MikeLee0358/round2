@@ -13,6 +13,11 @@ export default {
       headers: { Authorization: `Bearer ${getToken()}` }
     })
   },
+  updated({ userId, formData }) {
+    return apiHelper.put(`/users/${userId}`, formData, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    })
+  },
   addFavorite({ restaurantId }) {
     return apiHelper.post(`/favorite/${restaurantId}`, null, {
       headers: { authorization: `bearer ${getToken()}` }
